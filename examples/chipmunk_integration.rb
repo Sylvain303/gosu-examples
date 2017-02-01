@@ -12,8 +12,8 @@ require 'rubygems'
 require 'gosu'
 require 'chipmunk'
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 640
+HEIGHT = 480
 
 # The number of steps to process every Gosu update
 # The Player ship can get going so fast as to "move through" a
@@ -111,13 +111,11 @@ class Star# {{{
     @shape.body.a = 0.gosu_to_radians # faces towards top of screen
   end
 
-  def draw
-    img = @animation[Gosu::milliseconds / 100 % @animation.size];
+  def draw  
+    img = @animation[Gosu.milliseconds / 100 % @animation.size];
     img.draw(@shape.body.p.x - img.width / 2.0, @shape.body.p.y - img.height / 2.0, ZOrder::Stars, 1, 1, @color, :add)
   end
 end# }}}
-
-INFINITY = 1.0/0
 
 # Generates the Walls for the objects to bounce off
 class Wall
@@ -132,7 +130,7 @@ class Wall
     @a = CP::Vec2.new(shape[0][0], shape[0][1])
     @b = CP::Vec2.new(shape[1][0], shape[1][1])
 
-    @body = CP::Body.new(INFINITY, INFINITY)
+    @body = CP::Body.new(CP::INFINITY, CP::INFINITY)
     @body.p = CP::Vec2.new(pos[0], pos[1])
     @body.v = CP::Vec2.new(0,0)
 
@@ -267,20 +265,19 @@ class ChipmunkIntegration < (Example rescue Gosu::Window)
       @player.validate_position
 
       # Check keyboard
-      if Gosu::button_down? Gosu::KbLeft
+      if Gosu.button_down? Gosu::KB_LEFT
         @player.turn_left
       end
-      if Gosu::button_down? Gosu::KbRight
+      if Gosu.button_down? Gosu::KB_RIGHT
         @player.turn_right
       end
-
-      if Gosu::button_down? Gosu::KbUp
-        if Gosu::button_down?(Gosu::KbRightShift) or Gosu::button_down?(Gosu::KbLeftShift)
+      if Gosu.button_down? Gosu::KB_UP
+        if Gosu.button_down?(Gosu::KB_RIGHT_SHIFT) or Gosu.button_down?(Gosu::KB_LEFT_SHIFT)
           @player.boost
         else
           @player.accelerate
         end
-      elsif Gosu::button_down? Gosu::KbDown
+      elsif Gosu.button_down? Gosu::KB_DOWN
         @player.reverse
       end
 
@@ -290,7 +287,7 @@ class ChipmunkIntegration < (Example rescue Gosu::Window)
     end
 
     # Each update (not SUBSTEP) we see if we need to add more Stars
-    if rand(100) < 4 and @stars.size < 25 then
+    if rand(100) < 4 and @stars.size < 25
       body = CP::Body.new(0.0001, 0.0001)
       shape = CP::Shape::Circle.new(body, 25/2, CP::Vec2.new(0.0, 0.0))
       shape.collision_type = :star
@@ -311,8 +308,10 @@ class ChipmunkIntegration < (Example rescue Gosu::Window)
   end
 
   def button_down(id)
-    if id == Gosu::KbEscape
+    if id == Gosu::KB_ESCAPE
       close
+    else
+      super
     end
   end
 end
